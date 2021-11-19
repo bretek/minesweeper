@@ -143,23 +143,48 @@ fn main() {
     let mut y;
     let mut game_over = 0;
     let mut move_type = false;
-    let mut line = String::new();
+    let mut line;
     while game_over == 0 {
-        println!("Enter x y coords in format x y, or type flag to switch to flag placing mode");
-        std::io::stdin().read_line(&mut line).unwrap();
-        if line == "flag\n" {
-            move_type = !move_type;
+        loop {
             line = String::new();
+            println!("Enter x y coords in format x y, or type flag to switch to flag placing mode");
             std::io::stdin().read_line(&mut line).unwrap();
-            println!("Enter x y coords in format x y");
+            if line == "flag\n" {
+                move_type = !move_type;
+                line = String::new();
+                println!("Enter x y coords in format x y");
+                std::io::stdin().read_line(&mut line).unwrap();
+            }
+
+            let split: Vec<_> = line.split_whitespace().collect();
+            if split.len() == 2 {
+                let mut fail = false;
+                x = split[0].parse::<usize>().unwrap_or_else(|_| {
+                    println!("x coord wrong"); fail = true; 0
+                });
+                y = split[1].parse::<usize>().unwrap_or_else(|_| {
+                    println!("y coord wrong"); fail = true; 0
+                });
+                if !fail {
+                    if x < width && y < height {
+                        println!("x: {}, y: {}", x, y);
+                        break;
+                    }
+                    if x < width {
+                        if y < height {
+                            println!("x: {}, y: {}", x, y);
+                            break;
+                        }
+                        else {
+                            println!("y coord out of bounds");
+                        }
+                    }
+                    else {
+                        println!("x coord out of bounds");
+                    }
+                }
+            }
         }
-
-        let split: Vec<_> = line.split_whitespace().collect();
-        x = split[0].parse::<usize>().unwrap();
-        y = split[1].parse::<usize>().unwrap();
-        line = String::new();
-
-        println!("x: {}, y: {}", x, y);
 
         if make_move(x, y, move_type, &mut grid) == false {
             game_over = 1;
@@ -172,8 +197,6 @@ fn main() {
 }
 
 /*TODO: 
-fix bug when selecting same square twice
-input validation
 win condition
 clear all adjacent 0s
 */

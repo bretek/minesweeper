@@ -79,7 +79,18 @@ fn gen_grid (width: usize, height: usize, mut num_bombs: u64) -> Vec<Vec<u8>> {
 
 fn print_grid (width: usize, height: usize, show_bombs: bool, grid: &Vec<Vec<u8>>) {
     let mut symbol: char;
+    print!("  ");
+    for col in 0..width {
+        print!("{}", col);
+    }
+    print!("\n");
+    print!("  ");
+    for _ in 0..width {
+        print!("-");
+    }
+    print!("\n");
     for row in 0..height {
+        print!("{}|", row);
         for col in 0..width {
             symbol = match grid[row][col] {
                 symbol if symbol >= 29 && symbol <= 38 => {

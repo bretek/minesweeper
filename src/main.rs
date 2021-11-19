@@ -11,13 +11,13 @@ fn gen_grid (width: usize, height: usize, mut num_bombs: u64) -> Vec<Vec<u8>> {
     loop {
         if grid[x][y] == 0 {
             //place bomb at random location
-            grid[x][y] = 30;
+            grid[x][y] = 29;
             num_bombs-=1;
             if num_bombs == 0 {
                 //add numbers to grid
                 for row in 0..height {
                     for col in 0..width {
-                        if grid[row][col] >= 30 {
+                        if grid[row][col] >= 29 {
                             let mut allow_left = 1;
                             let mut allow_right = 1;
                             let mut allow_up = 1;
@@ -77,16 +77,23 @@ fn gen_grid (width: usize, height: usize, mut num_bombs: u64) -> Vec<Vec<u8>> {
     return grid;
 }
 
-fn print_grid (width: usize, height: usize, grid: Vec<Vec<u8>>) {
+fn print_grid (width: usize, height: usize, show_bombs: bool, grid: &Vec<Vec<u8>>) {
     let mut symbol: char;
     for row in 0..height {
         for col in 0..width {
             symbol = match grid[row][col] {
-                symbol if symbol >= 30 && symbol <= 38 => '*',
-                symbol if symbol >= 40 => '^',
+                symbol if symbol >= 29 && symbol <= 38 => {
+                    if show_bombs {
+                        '*'
+                    }
+                    else {
+                        '.'
+                    }
+                },
+                symbol if symbol >= 39 && symbol < 48 => '^',
                 10..=20 => '^',
-                0 => '.',
-                _ => (grid[row][col] + 48) as char
+                0..=8 => '.',
+                _ => grid[row][col] as char
             };
             
             print!("{}", symbol);
@@ -95,10 +102,60 @@ fn print_grid (width: usize, height: usize, grid: Vec<Vec<u8>>) {
     }
 }
 
+fn make_move(x: usize, y: usize, move_type: bool, grid: &mut Vec<Vec<u8>>) -> bool {
+    if move_type == true {
+        if grid[x][y] >= 39 || grid[x][y] < 20 && grid[x][y] >= 10 {
+            grid[x][y] -= 10;
+        }
+        else {
+            grid[x][y] += 10;
+        }
+    }
+    else {
+        if grid[x][y] >= 29 && grid[x][y] < 48 {
+            return false;
+        }
+        else {
+            grid[x][y] += 48;
+        }
+    }
+    return true;
+}
+
 fn main() {
     let width = 10;
     let height = 10;
     let num_bombs = 10;
-    let grid = gen_grid(width, height, num_bombs);
-    print_grid(width, height, grid);
+    let mut grid = gen_grid(width, height, num_bombs);
+    print_grid(width, height, false, &grid);
+    let mut x;
+    let mut y;
+    let mut game_over = 0;
+    let mut move_type = false;
+    let mut line = String::new();
+    while game_over == 0 {
+        println!("Enter x y coords in format x y, or type flag to switch to flag placing mode");
+        std::io::stdin().read_line(&mut line).unwrap();
+        if line == "flag\n" {
+            move_type = !move_type;
+            line = String::new();
+            std::io::stdin().read_line(&mut line).unwrap();
+            println!("Enter x y coords in format x y");
+        }
+
+        let split: Vec<_> = line.split_whitespace().collect();
+        x = split[0].parse::<usize>().unwrap();
+        y = split[1].parse::<usize>().unwrap();
+        line = String::new();
+
+        println!("x: {}, y: {}", x, y);
+
+        if make_move(x, y, move_type, &mut grid) == false {
+            game_over = 1;
+            print_grid(width, height, true, &grid);
+        }
+        else {
+            print_grid(width, height, false, &grid);
+        }
+    }
 }

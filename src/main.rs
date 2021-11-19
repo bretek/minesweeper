@@ -126,7 +126,7 @@ fn make_move(x: usize, y: usize, move_type: bool, grid: &mut Vec<Vec<u8>>) -> bo
         if grid[x][y] >= 29 && grid[x][y] < 48 {
             return false;
         }
-        else {
+        else if grid[x][y] <= 8 {
             grid[x][y] += 48;
         }
     }
@@ -170,3 +170,10 @@ fn main() {
         }
     }
 }
+
+/*TODO: 
+fix bug when selecting same square twice
+input validation
+win condition
+clear all adjacent 0s
+*/

@@ -148,10 +148,35 @@ fn make_move(x: usize, y: usize, move_type: bool, grid: &mut Vec<Vec<u8>>) -> bo
             return false;
         }
         else if grid[x][y] <= 8 {
-            grid[x][y] += 48;
+            if grid[x][y] == 0 {
+                grid[x][y] += 48;
+                clear_adjacent_zeros(x, y, grid);
+            }
+            else {
+                grid[x][y] += 48;
+            }
         }
     }
     return true;
+}
+
+// show adjacent squares
+fn clear_adjacent_zeros (x:usize, y:usize, grid: &mut Vec<Vec<u8>>) {
+    // for all adjacent squares within bounds
+    for nx in (if x == 0 {x} else {x-1})..=(if x == grid.len()-1 {x} else {x+1}) {
+        for ny in (if y == 0 {y} else {y-1})..=(if y == grid[0].len()-1 {y} else {y+1}) {
+            // if unrevealed number
+            if grid[nx][ny] <= 8 {
+                if grid[nx][ny] == 0 {
+                    grid[nx][ny] += 48;
+                    clear_adjacent_zeros(nx, ny, grid);
+                }
+                else {
+                    grid[nx][ny] += 48;
+                }
+            }
+        }
+    }
 }
 
 // check win condition
@@ -248,7 +273,3 @@ fn main() {
         }
     }
 }
-
-/*TODO: 
-clear all adjacent 0s
-*/

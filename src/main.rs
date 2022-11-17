@@ -199,16 +199,10 @@ fn main() {
                         break;
                     }
                     if x < width {
-                        if y < height {
-                            println!("x: {}, y: {}", x, y);
-                            break;
-                        }
-                        else {
-                            println!("y coord out of bounds");
-                        }
-                    }
-                    else {
                         println!("x coord out of bounds");
+                    }
+                    if y < height {
+                        println!("y coord out of bounds");
                     }
                 }
             }

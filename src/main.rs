@@ -154,6 +154,29 @@ fn make_move(x: usize, y: usize, move_type: bool, grid: &mut Vec<Vec<u8>>) -> bo
     return true;
 }
 
+// check win condition
+fn check_win (grid: &Vec<Vec<u8>>) -> bool {
+    let mut covered_squares = 0;
+    for row in 0..grid.len() {
+        for col in 0..grid[0].len() {
+            // incorrect flag
+            if grid[row][col] >= 10 && grid[row][col] <= 20 {
+                return false;
+            }
+            // uncovered square
+            if grid[row][col] <= 8 {
+                covered_squares += 1;
+            }
+        }
+    }
+
+    if covered_squares == 0 {
+        return true;
+    }
+
+    return false;
+}
+
 fn main() {
     // setup grid
     let width = 10;
@@ -214,12 +237,18 @@ fn main() {
             print_grid(width, height, true, &grid);
         }
         else {
-            print_grid(width, height, false, &grid);
+            if check_win(&grid) {
+                print_grid(width, height, true, &grid);
+                game_over = 1;
+                println!("You Won!");
+            }
+            else {
+                print_grid(width, height, false, &grid);
+            }
         }
     }
 }
 
 /*TODO: 
-win condition
 clear all adjacent 0s
 */
